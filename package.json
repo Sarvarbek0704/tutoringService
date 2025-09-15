@@ -1,0 +1,30 @@
+{
+  "name": "tutoringservice",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node --watch app",
+    "prod": "node app"
+  },
+  "keywords": [],
+  "author": "Sarvarbek Sodiqov",
+  "license": "ISC",
+  "description": "1-mustaqil loyiham (Sarvarbek Sodiqov",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "config": "^4.1.1",
+    "cookie-parser": "^1.4.7",
+    "cross-env": "^10.0.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.3",
+    "express-winston": "^4.2.0",
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "otp-generator": "^4.0.1",
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7",
+    "winston": "^3.17.0",
+    "winston-mongodb": "^7.0.1"
+  }
+}
