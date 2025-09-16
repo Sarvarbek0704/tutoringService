@@ -46,6 +46,18 @@ const Owner = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    activation_code: {
+      type: DataTypes.STRING(10),
+      allowNull: true,
+    },
+    activation_token: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    activation_sent_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,

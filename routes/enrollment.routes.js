@@ -10,13 +10,23 @@ const {
   createEnrollmentSchema,
   updateEnrollmentSchema,
 } = require("../validations/enrollment.validation");
-
+const {
+  adminGuard,
+  ownerGuard,
+  selfGuard,
+  creatorGuard,
+} = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", validate(createEnrollmentSchema), addEnrollment);
-router.get("/", getAllEnrollments);
-router.get("/:id", getEnrollmentById);
-router.put("/:id", validate(updateEnrollmentSchema), updateEnrollmentById);
-router.delete("/:id", deleteEnrollmentById);
+router.post("/", adminGuard, validate(createEnrollmentSchema), addEnrollment);
+router.get("/", adminGuard, getAllEnrollments);
+router.get("/:id", adminGuard, getEnrollmentById);
+router.put(
+  "/:id",
+  adminGuard,
+  validate(updateEnrollmentSchema),
+  updateEnrollmentById
+);
+router.delete("/:id", adminGuard, deleteEnrollmentById);
 
 module.exports = router;

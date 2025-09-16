@@ -8,6 +8,9 @@ const ownerRouter = require("./owner.routes");
 const paymentRouter = require("./payment.routes");
 const scheduleRouter = require("./schedule.routes");
 const subjectRouter = require("./subject.routes");
+const clientAuthRouter = require("./client.auth.routes");
+const ownerAuthRouter = require("./owner.auth.routes");
+const adminAuthRouter = require("./admin.auth.routes");
 
 const router = require("express").Router();
 
@@ -21,5 +24,8 @@ router.use("/owner", ownerRouter);
 router.use("/payment", paymentRouter);
 router.use("/schedule", scheduleRouter);
 router.use("/subject", subjectRouter);
+router.use("/client/auth", clientAuthRouter);
+router.use("/owner/auth", ownerAuthRouter);
+router.use("/admin/auth", adminAuthRouter);
 
 module.exports = router;

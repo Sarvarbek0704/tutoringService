@@ -10,13 +10,23 @@ const {
   createPaymentSchema,
   updatePaymentSchema,
 } = require("../validations/payment.validation");
-
+const {
+  adminGuard,
+  ownerGuard,
+  selfGuard,
+  creatorGuard,
+} = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", validate(createPaymentSchema), addPayment);
-router.get("/", getAllPayments);
-router.get("/:id", getPaymentById);
-router.put("/:id", validate(updatePaymentSchema), updatePaymentById);
-router.delete("/:id", deletePaymentById);
+router.post("/", adminGuard, validate(createPaymentSchema), addPayment);
+router.get("/", adminGuard, getAllPayments);
+router.get("/:id", adminGuard, getPaymentById);
+router.put(
+  "/:id",
+  adminGuard,
+  validate(updatePaymentSchema),
+  updatePaymentById
+);
+router.delete("/:id", adminGuard, deletePaymentById);
 
 module.exports = router;

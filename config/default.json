@@ -5,12 +5,17 @@
   "db_password": "root",
   "db_port": 5432,
   "db_name": "ts3",
-  "acces_key": "SMD_access_key",
+  "access_key": "SMD_access_key",
   "refresh_key": "SMD_refresh_key",
   "access_time": "5h",
   "refresh_time": "10d",
   "cookie_refresh_token_time": 1296000000,
   "secret": "SecretKeyFromConfig",
   "iv": "adssd123",
-  "crypt_password": "JudaKuchliMaxfiyPassword"
+  "crypt_password": "JudaKuchliMaxfiyPassword",
+  "email": {
+    "user": "coolsarvar2007@gmail.com",
+    "password": "zzdk bali ratr vtpv",
+    "from": "coolsarvar2007@gmail.com"
+  }
 }

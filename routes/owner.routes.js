@@ -10,13 +10,24 @@ const {
   createOwnerSchema,
   updateOwnerSchema,
 } = require("../validations/owner.validation");
-
+const {
+  adminGuard,
+  ownerGuard,
+  selfGuard,
+  creatorGuard,
+} = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", validate(createOwnerSchema), addOwner);
-router.get("/", getAllOwners);
-router.get("/:id", getOwnerById);
-router.put("/:id", validate(updateOwnerSchema), updateOwnerById);
-router.delete("/:id", deleteOwnerById);
+router.post("/", adminGuard, validate(createOwnerSchema), addOwner);
+router.get("/", adminGuard, getAllOwners);
+router.get("/:id", adminGuard, selfGuard, getOwnerById);
+router.put(
+  "/:id",
+  adminGuard,
+  selfGuard,
+  validate(updateOwnerSchema),
+  updateOwnerById
+);
+router.delete("/:id", adminGuard, deleteOwnerById);
 
 module.exports = router;

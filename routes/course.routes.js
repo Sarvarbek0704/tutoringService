@@ -10,13 +10,24 @@ const {
   createCourseSchema,
   updateCourseSchema,
 } = require("../validations/course.validation");
-
+const {
+  adminGuard,
+  ownerGuard,
+  selfGuard,
+  creatorGuard,
+} = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", validate(createCourseSchema), addCourse);
-router.get("/", getAllCourses);
-router.get("/:id", getCourseById);
-router.put("/:id", validate(updateCourseSchema), updateCourseById);
-router.delete("/:id", deleteCourseById);
+router.post(
+  "/",
+  adminGuard,
+  ownerGuard,
+  validate(createCourseSchema),
+  addCourse
+);
+router.get("/", adminGuard, ownerGuard, getAllCourses);
+router.get("/:id", adminGuard, ownerGuard, getCourseById);
+router.put("/:id", adminGuard, validate(updateCourseSchema), updateCourseById);
+router.delete("/:id", adminGuard, deleteCourseById);
 
 module.exports = router;
