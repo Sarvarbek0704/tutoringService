@@ -1,45 +1,33 @@
 const selfGuard = (req, res, next) => {
   try {
-    // Foydalanuvchi mavjudligini tekshirish
     if (!req.user) {
       return res.status(401).json({
-        success: false,
         message: "Kirish huquqi talab qilinadi",
       });
     }
+    const requestedUserId = req.params.id;
 
-    // URL parametridan foydalanuvchi ID sini olish
-    const requestedUserId = req.params.userId || req.params.id;
-
-    // Agar userId parametri bo'lmasa, body dan olish
     const targetUserId = requestedUserId || req.body.userId;
 
     if (!targetUserId) {
       return res.status(400).json({
-        success: false,
-        message: "Foydalanuvchi ID si ko'rsatilmagan",
+        message: "User ID not specified",
       });
     }
-
-    // Foydalanuvchi o'z ma'lumotlariga kirish huquqiga ega yoki admin/owner ekanligini tekshirish
     if (
       req.user.id.toString() !== targetUserId &&
       req.user.role !== "admin" &&
-      req.user.role !== "owner"
+      req.user.role !== "creator"
     ) {
       return res.status(403).json({
-        success: false,
-        message: "Siz faqat o'z ma'lumotlaringizga kirish huquqiga egasiz",
+        message: "You only have access to your own data.",
       });
     }
-
-    // Keyingi middlewarega o'tish
     next();
   } catch (error) {
-    console.error("Self guard xatosi:", error);
+    console.error("Self guard error:", error);
     return res.status(500).json({
-      success: false,
-      message: "Server xatosi",
+      message: "Server error",
     });
   }
 };

@@ -1,8 +1,6 @@
-// middlewares/errorHandling.js
 const logger = require("../services/logger.service");
 
 function errorHandling(err, req, res, next) {
-  // Xatoni log qilish
   logger.error({
     message: err.message,
     name: err.name,
@@ -16,19 +14,10 @@ function errorHandling(err, req, res, next) {
 
   let statusCode = 500;
   let message = "Internal Server Error";
-
-  // -------------------
-  // Express/Custom xatolar
-  // -------------------
   if (err.status) {
     statusCode = err.status;
     message = err.message || message;
-  }
-
-  // -------------------
-  // Sequelize xatolar
-  // -------------------
-  else if (err.name === "SequelizeValidationError") {
+  } else if (err.name === "SequelizeValidationError") {
     statusCode = 400;
     message = err.errors.map((e) => e.message).join(", ");
   } else if (err.name === "SequelizeUniqueConstraintError") {
@@ -48,12 +37,7 @@ function errorHandling(err, req, res, next) {
   } else if (err.name === "SequelizeTimeoutError") {
     statusCode = 504;
     message = "Database request timeout";
-  }
-
-  // -------------------
-  // Postgres xatolar (kod orqali)
-  // -------------------
-  else if (err.code === "23505") {
+  } else if (err.code === "23505") {
     statusCode = 409;
     message = "Duplicate value (unique constraint)";
   } else if (err.code === "23503") {
@@ -78,15 +62,8 @@ function errorHandling(err, req, res, next) {
     statusCode = 503;
     message = "Connection failure";
   }
-
-  // -------------------
-  // Default (noaniq xato)
-  // -------------------
   res.status(statusCode).json({
-    success: false,
     message,
-    // Faqat development rejimida qo'shimcha ma'lumot jo'natamiz
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 }
 

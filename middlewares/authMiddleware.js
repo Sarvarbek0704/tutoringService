@@ -1,29 +1,21 @@
 const jwtService = require("../services/jwt.service");
 const Client = require("../models/client");
 const Admin = require("../models/admin");
-
 const Owner = require("../models/owner");
 
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
-        success: false,
-        error: "Access token kerak",
+        error: "Access token need",
       });
     }
-
     const decoded = await jwtService.verifyAccessToken(token);
-
-    // Foydalanuvchi turi va ID sini ajratib olish
     const { id, type } = decoded;
-
     let userModel;
-
-    // Foydalanuvchi turiga qarab modelni tanlash
     switch (type) {
       case "admin":
         userModel = Admin;
@@ -39,22 +31,15 @@ const authenticateToken = async (req, res, next) => {
         break;
       default:
         return res.status(403).json({
-          success: false,
-          error: `Noto'g'ri foydalanuvchi turi: ${type}`,
+          error: `Invalid user type: ${type}`,
         });
     }
-
-    // Foydalanuvchini topish
     const user = await userModel.findByPk(id);
-
     if (!user || !user.status) {
       return res.status(403).json({
-        success: false,
-        error: "Yaroqsiz token yoki foydalanuvchi faol emas",
+        error: "Invalid token or inactive user",
       });
     }
-
-    // Requestga foydalanuvchi ma'lumotlarini qo'shish
     req.user = {
       id: user.id,
       email: user.email,
@@ -67,22 +52,19 @@ const authenticateToken = async (req, res, next) => {
   } catch (error) {
     if (error.name === "JsonWebTokenError") {
       return res.status(403).json({
-        success: false,
-        error: "Yaroqsiz token",
+        error: "Invalid token",
       });
     }
 
     if (error.name === "TokenExpiredError") {
       return res.status(403).json({
-        success: false,
-        error: "Token muddati o'tgan",
+        error: "Token expired",
       });
     }
 
-    console.error("Auth middleware xatosi:", error);
+    console.error("Auth middleware error:", error);
     res.status(500).json({
-      success: false,
-      error: "Server xatosi",
+      error: "Server error",
     });
   }
 };

@@ -1,28 +1,21 @@
 const creatorGuard = (req, res, next) => {
   try {
-    // Foydalanuvchi mavjudligini tekshirish
     if (!req.user) {
       return res.status(401).json({
-        success: false,
-        message: "Kirish huquqi talab qilinadi",
+        message: "Access is required",
       });
     }
 
-    // Creator huquqlarini tekshirish (masalan, content_creator roli)
-    if (req.user.role !== "creator" && req.user.role !== "admin") {
+    if (req.user.role !== "creator") {
       return res.status(403).json({
-        success: false,
-        message: "Faqat creatorlar uchun ruxsat etilgan",
+        message: "Allowed only for creators",
       });
     }
-
-    // Keyingi middlewarega o'tish
     next();
   } catch (error) {
-    console.error("Creator guard xatosi:", error);
+    console.error("Creator guard error:", error);
     return res.status(500).json({
-      success: false,
-      message: "Server xatosi",
+      message: "Server error",
     });
   }
 };

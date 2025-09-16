@@ -5,12 +5,11 @@ const selfGuard = require("./self.guard");
 const clientGuard = require("./client.guard");
 const ownerGuard = require("./owner.guard");
 
-
 module.exports = {
   authenticateToken,
   adminGuard,
   creatorGuard,
   selfGuard,
   clientGuard,
-  ownerGuard
+  ownerGuard,
 };

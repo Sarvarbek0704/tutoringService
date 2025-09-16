@@ -1,32 +1,25 @@
 const ownerGuard = (req, res, next) => {
   try {
-    // Foydalanuvchi mavjudligini tekshirish
     if (!req.user) {
       return res.status(401).json({
-        success: false,
-        message: "Kirish huquqi talab qilinadi",
+        message: "Access is required",
       });
     }
 
-    // Owner yoki Admin huquqlarini tekshirish
     if (
       req.user.role !== "owner" &&
       req.user.role !== "admin" &&
       req.user.role !== "creator"
     ) {
       return res.status(403).json({
-        success: false,
-        message: "Faqat ownerlar yoki administratorlar uchun ruxsat etilgan",
+        message: "Only allowed for owners or administrators",
       });
     }
-
-    // Keyingi middlewarega o'tish
     next();
   } catch (error) {
-    console.error("Owner guard xatosi:", error);
+    console.error("Owner guard error:", error);
     return res.status(500).json({
-      success: false,
-      message: "Server xatosi",
+      message: "Server error",
     });
   }
 };
