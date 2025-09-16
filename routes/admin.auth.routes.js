@@ -3,9 +3,8 @@ const router = express.Router();
 const authController = require("../controllers/admin.auth.controller");
 const validate = require("../middlewares/validate");
 const { adminRegisterSchema } = require("../validations/admin.validation");
-const { authenticateToken } = require("../middlewares/authMiddleware");
+const { authenticateToken } = require("../middlewares/guards/index");
 
-// Routes
 router.post(
   "/register",
   validate(adminRegisterSchema),
@@ -14,6 +13,5 @@ router.post(
 router.post("/login", authController.login);
 router.post("/logout", authController.logout);
 router.post("/refresh-token", authController.refreshToken);
-router.get("/profile", authenticateToken, authController.getProfile);
 
 module.exports = router;

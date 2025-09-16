@@ -11,6 +11,7 @@ const {
   updateCertificateSchema,
 } = require("../validations/certificate.validations");
 const {
+  authenticateToken,
   adminGuard,
   ownerGuard,
   selfGuard,
@@ -20,20 +21,34 @@ const router = require("express").Router();
 
 router.post(
   "/",
+  authenticateToken,
   adminGuard,
   ownerGuard,
   validate(createCertificateSchema),
   addCertificate
 );
-router.get("/", adminGuard, ownerGuard, getAllCertificates);
-router.get("/:id", adminGuard, ownerGuard, getCertificateById);
+router.get("/", authenticateToken, adminGuard, ownerGuard, getAllCertificates);
+router.get(
+  "/:id",
+  authenticateToken,
+  adminGuard,
+  ownerGuard,
+  getCertificateById
+);
 router.put(
   "/:id",
+  authenticateToken,
   adminGuard,
   ownerGuard,
   validate(updateCertificateSchema),
   updateCertificateById
 );
-router.delete("/:id", adminGuard, ownerGuard, deleteCertificateById);
+router.delete(
+  "/:id",
+  authenticateToken,
+  adminGuard,
+  ownerGuard,
+  deleteCertificateById
+);
 
 module.exports = router;

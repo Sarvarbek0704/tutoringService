@@ -1,7 +1,6 @@
-const { cli } = require("winston/lib/winston/config");
 const Contract = require("../models/contract");
 
-const addContract = async (req, res) => {
+const addContract = async (req, res, next) => {
   try {
     const { enrollment_id, start_date, end_date, status, created_at } =
       req.body;
@@ -18,12 +17,11 @@ const addContract = async (req, res) => {
       data: newContract,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding contract" });
+    next(error);
   }
 };
 
-const getAllContracts = async (req, res) => {
+const getAllContracts = async (req, res, next) => {
   try {
     const contracts = await Contract.findAll();
     res.status(201).send({
@@ -31,12 +29,11 @@ const getAllContracts = async (req, res) => {
       data: contracts,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all contracts" });
+    next(error);
   }
 };
 
-const getContractById = async (req, res) => {
+const getContractById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const contract = await Contract.findByPk(id);
@@ -45,12 +42,11 @@ const getContractById = async (req, res) => {
       data: contract,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one contract" });
+    next(error);
   }
 };
 
-const updateContractById = async (req, res) => {
+const updateContractById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const contract = await Contract.update(req.body, {
@@ -63,12 +59,11 @@ const updateContractById = async (req, res) => {
       data: contract[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating contract" });
+    next(error);
   }
 };
 
-const deleteContractById = async (req, res) => {
+const deleteContractById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Contract.destroy({
@@ -79,8 +74,7 @@ const deleteContractById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting contract" });
+    next(error);
   }
 };
 

@@ -26,6 +26,10 @@ const Admin = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    role: {
+      type: DataTypes.STRING(20),
+      defaultValue: "creator",
+    },
     is_creator: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

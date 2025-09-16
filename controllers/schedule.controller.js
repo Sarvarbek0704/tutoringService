@@ -1,7 +1,6 @@
-const { cli } = require("winston/lib/winston/config");
 const Schedule = require("../models/shedule");
 
-const addSchedule = async (req, res) => {
+const addSchedule = async (req, res, next) => {
   try {
     const { day_of_week, course_id, start_time, end_time } = req.body;
 
@@ -17,12 +16,11 @@ const addSchedule = async (req, res) => {
       data: newSchedule,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding schedule" });
+    next(error);
   }
 };
 
-const getAllSchedules = async (req, res) => {
+const getAllSchedules = async (req, res, next) => {
   try {
     const schedules = await Schedule.findAll();
     res.status(201).send({
@@ -30,12 +28,11 @@ const getAllSchedules = async (req, res) => {
       data: schedules,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all schedules" });
+    next(error);
   }
 };
 
-const getScheduleById = async (req, res) => {
+const getScheduleById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const schedule = await Schedule.findByPk(id);
@@ -44,12 +41,11 @@ const getScheduleById = async (req, res) => {
       data: schedule,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one schedule" });
+    next(error);
   }
 };
 
-const updateScheduleById = async (req, res) => {
+const updateScheduleById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const schedule = await Schedule.update(req.body, {
@@ -62,12 +58,11 @@ const updateScheduleById = async (req, res) => {
       data: schedule[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating schedule" });
+    next(error);
   }
 };
 
-const deleteScheduleById = async (req, res) => {
+const deleteScheduleById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Schedule.destroy({
@@ -78,8 +73,7 @@ const deleteScheduleById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting schedule" });
+    next(error);
   }
 };
 

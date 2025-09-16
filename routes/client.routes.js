@@ -6,6 +6,7 @@ const {
   deleteClientById,
 } = require("../controllers/client.controller");
 const {
+  authenticateToken,
   adminGuard,
   ownerGuard,
   selfGuard,
@@ -18,16 +19,23 @@ const {
   updateClientSchema,
 } = require("../validations/client.validation");
 
-router.post("/", adminGuard, validate(createClientSchema), addClient);
-router.get("/", adminGuard, getAllClients);
-router.get("/:id", adminGuard, selfGuard, getClientById);
+router.post(
+  "/",
+  authenticateToken,
+  adminGuard,
+  validate(createClientSchema),
+  addClient
+);
+router.get("/", authenticateToken, adminGuard, getAllClients);
+router.get("/:id", authenticateToken, adminGuard, selfGuard, getClientById);
 router.put(
   "/:id",
+  authenticateToken,
   adminGuard,
   selfGuard,
   validate(updateClientSchema),
   updateClientById
 );
-router.delete("/:id", adminGuard, deleteClientById);
+router.delete("/:id", authenticateToken, adminGuard, deleteClientById);
 
 module.exports = router;

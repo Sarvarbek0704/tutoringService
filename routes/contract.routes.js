@@ -11,6 +11,7 @@ const {
   updateContractSchema,
 } = require("../validations/contract.validation");
 const {
+  authenticateToken,
   adminGuard,
   ownerGuard,
   selfGuard,
@@ -18,15 +19,22 @@ const {
 } = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", adminGuard, validate(createContractSchema), addContract);
-router.get("/", adminGuard, getAllContracts);
-router.get("/:id", adminGuard, getContractById);
+router.post(
+  "/",
+  authenticateToken,
+  adminGuard,
+  validate(createContractSchema),
+  addContract
+);
+router.get("/", authenticateToken, adminGuard, getAllContracts);
+router.get("/:id", authenticateToken, adminGuard, getContractById);
 router.put(
   "/:id",
+  authenticateToken,
   adminGuard,
   validate(updateContractSchema),
   updateContractById
 );
-router.delete("/:id", adminGuard, deleteContractById);
+router.delete("/:id", authenticateToken, adminGuard, deleteContractById);
 
 module.exports = router;

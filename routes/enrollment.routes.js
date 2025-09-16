@@ -11,6 +11,7 @@ const {
   updateEnrollmentSchema,
 } = require("../validations/enrollment.validation");
 const {
+  authenticateToken,
   adminGuard,
   ownerGuard,
   selfGuard,
@@ -18,15 +19,22 @@ const {
 } = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", adminGuard, validate(createEnrollmentSchema), addEnrollment);
-router.get("/", adminGuard, getAllEnrollments);
-router.get("/:id", adminGuard, getEnrollmentById);
+router.post(
+  "/",
+  authenticateToken,
+  adminGuard,
+  validate(createEnrollmentSchema),
+  addEnrollment
+);
+router.get("/", authenticateToken, adminGuard, getAllEnrollments);
+router.get("/:id", authenticateToken, adminGuard, getEnrollmentById);
 router.put(
   "/:id",
+  authenticateToken,
   adminGuard,
   validate(updateEnrollmentSchema),
   updateEnrollmentById
 );
-router.delete("/:id", adminGuard, deleteEnrollmentById);
+router.delete("/:id", authenticateToken, adminGuard, deleteEnrollmentById);
 
 module.exports = router;

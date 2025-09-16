@@ -1,8 +1,7 @@
-const { cli } = require("winston/lib/winston/config");
 const Owner = require("../models/owner");
 const { sendErrorResponse } = require("../helpers/send.error.response");
 
-const addOwner = async (req, res) => {
+const addOwner = async (req, res, next) => {
   try {
     const {
       full_name,
@@ -19,7 +18,7 @@ const addOwner = async (req, res) => {
         .send({ message: "This email has already been registered." });
     }
     if (password !== confirm_password) {
-      return sendErrorResponse({ message: "parollar togri kelmaydi" }, res, 403);
+      return sendErrorResponse({ message: "Passwords is incorrect" }, res, 403);
     }
     const newOwner = await Owner.create({
       full_name,
@@ -34,12 +33,11 @@ const addOwner = async (req, res) => {
       data: newOwner,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding owner" });
+    next(error);
   }
 };
 
-const getAllOwners = async (req, res) => {
+const getAllOwners = async (req, res, next) => {
   try {
     const owners = await Owner.findAll();
     res.status(201).send({
@@ -47,12 +45,11 @@ const getAllOwners = async (req, res) => {
       data: owners,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all owners" });
+    next(error);
   }
 };
 
-const getOwnerById = async (req, res) => {
+const getOwnerById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const owner = await Owner.findByPk(id);
@@ -61,12 +58,11 @@ const getOwnerById = async (req, res) => {
       data: owner,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one owner" });
+    next(error);
   }
 };
 
-const updateOwnerById = async (req, res) => {
+const updateOwnerById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const owner = await Owner.update(req.body, {
@@ -79,12 +75,11 @@ const updateOwnerById = async (req, res) => {
       data: owner[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating owner" });
+    next(error);
   }
 };
 
-const deleteOwnerById = async (req, res) => {
+const deleteOwnerById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Owner.destroy({
@@ -95,8 +90,7 @@ const deleteOwnerById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting owner" });
+    next(error);
   }
 };
 

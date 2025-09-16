@@ -1,4 +1,3 @@
-const { cli } = require("winston/lib/winston/config");
 const Course = require("../models/course");
 
 const addCourse = async (req, res, next) => {
@@ -14,7 +13,6 @@ const addCourse = async (req, res, next) => {
       price,
       duration_weeks,
     });
-    // await newCourse.save();
     res.status(201).send({
       message: "new course added",
       data: newCourse,
@@ -33,8 +31,6 @@ const getAllCourses = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    // console.log(error);
-    // res.status(500).send({ error: "Error viewing all courses" });
   }
 };
 
@@ -48,8 +44,6 @@ const getCourseById = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    // console.log(error);
-    // res.status(500).send({ error: "Error viewing one course" });
   }
 };
 
@@ -67,8 +61,6 @@ const updateCourseById = async (req, res) => {
     });
   } catch (error) {
     next(error);
-    // console.log(error);
-    // res.status(500).send({ error: "Error while updating course" });
   }
 };
 
@@ -84,8 +76,6 @@ const deleteCourseById = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    // console.log(error);
-    // res.status(500).send({ error: "Error while deleting course" });
   }
 };
 

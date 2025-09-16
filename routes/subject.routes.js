@@ -11,6 +11,7 @@ const {
   updateSubjectSchema,
 } = require("../validations/subject.validation");
 const {
+  authenticateToken,
   adminGuard,
   ownerGuard,
   selfGuard,
@@ -18,15 +19,22 @@ const {
 } = require("../middlewares/guards");
 const router = require("express").Router();
 
-router.post("/", adminGuard, validate(createSubjectSchema), addSubject);
-router.get("/", adminGuard, getAllSubjects);
-router.get("/:id", adminGuard, getSubjectById);
+router.post(
+  "/",
+  authenticateToken,
+  adminGuard,
+  validate(createSubjectSchema),
+  addSubject
+);
+router.get("/", authenticateToken, adminGuard, getAllSubjects);
+router.get("/:id", authenticateToken, adminGuard, getSubjectById);
 router.put(
   "/:id",
+  authenticateToken,
   adminGuard,
   validate(updateSubjectSchema),
   updateSubjectById
 );
-router.delete("/:id", adminGuard, deleteSubjectById);
+router.delete("/:id", authenticateToken, adminGuard, deleteSubjectById);
 
 module.exports = router;

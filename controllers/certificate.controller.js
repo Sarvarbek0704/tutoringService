@@ -1,7 +1,6 @@
-const { cli } = require("winston/lib/winston/config");
 const Certificate = require("../models/certificate");
 
-const addCertificate = async (req, res) => {
+const addCertificate = async (req, res, next) => {
   try {
     const { student_id, course_id, issued_date, grade } = req.body;
     const newCertificate = await Certificate.create({
@@ -16,12 +15,11 @@ const addCertificate = async (req, res) => {
       data: newCertificate,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding certificate" });
+    next(error);
   }
 };
 
-const getAllCertificates = async (req, res) => {
+const getAllCertificates = async (req, res, next) => {
   try {
     const certificates = await Certificate.findAll();
     res.status(201).send({
@@ -29,12 +27,11 @@ const getAllCertificates = async (req, res) => {
       data: certificates,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all certificates" });
+    next(error);
   }
 };
 
-const getCertificateById = async (req, res) => {
+const getCertificateById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const certificate = await Certificate.findByPk(id);
@@ -43,12 +40,11 @@ const getCertificateById = async (req, res) => {
       data: certificate,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one certificate" });
+    next(error);
   }
 };
 
-const updateCertificateById = async (req, res) => {
+const updateCertificateById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const certificate = await Certificate.update(req.body, {
@@ -61,12 +57,11 @@ const updateCertificateById = async (req, res) => {
       data: certificate[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating certificate" });
+    next(error);
   }
 };
 
-const deleteCertificateById = async (req, res) => {
+const deleteCertificateById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Certificate.destroy({
@@ -77,8 +72,7 @@ const deleteCertificateById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting certificate" });
+    next(error);
   }
 };
 

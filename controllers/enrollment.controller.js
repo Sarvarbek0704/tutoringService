@@ -1,13 +1,20 @@
 const { cli } = require("winston/lib/winston/config");
 const Enrollment = require("../models/enrollment");
 
-const addEnrollment = async (req, res) => {
+const addEnrollment = async (req, res, next) => {
   try {
-    const { student_id, course_id, status, enrolled_at, cancelled_at } =
-      req.body;
+    const {
+      student_id,
+      course_id,
+      status,
+      enrolled_at,
+      cancelled_at,
+      contract_id,
+    } = req.body;
 
     const newEnrollment = await Enrollment.create({
       student_id,
+      contract_id,
       course_id,
       status,
       enrolled_at,
@@ -19,12 +26,11 @@ const addEnrollment = async (req, res) => {
       data: newEnrollment,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding enrollment" });
+    next(error);
   }
 };
 
-const getAllEnrollments = async (req, res) => {
+const getAllEnrollments = async (req, res, next) => {
   try {
     const enrollments = await Enrollment.findAll();
     res.status(201).send({
@@ -32,12 +38,11 @@ const getAllEnrollments = async (req, res) => {
       data: enrollments,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all enrollments" });
+    next(error);
   }
 };
 
-const getEnrollmentById = async (req, res) => {
+const getEnrollmentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const enrollment = await Enrollment.findByPk(id);
@@ -46,12 +51,11 @@ const getEnrollmentById = async (req, res) => {
       data: enrollment,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one enrollment" });
+    next(error);
   }
 };
 
-const updateEnrollmentById = async (req, res) => {
+const updateEnrollmentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const enrollment = await Enrollment.update(req.body, {
@@ -64,12 +68,11 @@ const updateEnrollmentById = async (req, res) => {
       data: enrollment[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating enrollment" });
+    next(error);
   }
 };
 
-const deleteEnrollmentById = async (req, res) => {
+const deleteEnrollmentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Enrollment.destroy({
@@ -80,8 +83,7 @@ const deleteEnrollmentById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting enrollment" });
+    next(error);
   }
 };
 

@@ -11,6 +11,7 @@ const {
   updateCourseSchema,
 } = require("../validations/course.validation");
 const {
+  authenticateToken,
   adminGuard,
   ownerGuard,
   selfGuard,
@@ -20,14 +21,21 @@ const router = require("express").Router();
 
 router.post(
   "/",
+  authenticateToken,
   adminGuard,
   ownerGuard,
   validate(createCourseSchema),
   addCourse
 );
-router.get("/", adminGuard, ownerGuard, getAllCourses);
-router.get("/:id", adminGuard, ownerGuard, getCourseById);
-router.put("/:id", adminGuard, validate(updateCourseSchema), updateCourseById);
-router.delete("/:id", adminGuard, deleteCourseById);
+router.get("/", authenticateToken, adminGuard, ownerGuard, getAllCourses);
+router.get("/:id", authenticateToken, adminGuard, ownerGuard, getCourseById);
+router.put(
+  "/:id",
+  authenticateToken,
+  adminGuard,
+  validate(updateCourseSchema),
+  updateCourseById
+);
+router.delete("/:id", authenticateToken, adminGuard, deleteCourseById);
 
 module.exports = router;

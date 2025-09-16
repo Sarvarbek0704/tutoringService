@@ -23,7 +23,7 @@ const selfGuard = (req, res, next) => {
 
     // Foydalanuvchi o'z ma'lumotlariga kirish huquqiga ega yoki admin/owner ekanligini tekshirish
     if (
-      req.user._id.toString() !== targetUserId &&
+      req.user.id.toString() !== targetUserId &&
       req.user.role !== "admin" &&
       req.user.role !== "owner"
     ) {

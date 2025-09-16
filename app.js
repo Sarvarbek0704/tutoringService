@@ -1,17 +1,20 @@
 const express = require("express");
 const config = require("config");
 const sequelize = require("./config/db");
+const cookieParser = require("cookie-parser");
 
 const mainRouter = require("./routes/index");
-const errorHandler = require("./middlewares/errorHandler");
+const errorHandling = require("./middlewares/errorHandling");
+const logger = require("./services/logger.service");
 
 const PORT = config.get("port") ?? 7777;
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api", mainRouter);
-app.use(errorHandler);
+app.use(errorHandling);
 const start = async () => {
   try {
     await sequelize.authenticate();

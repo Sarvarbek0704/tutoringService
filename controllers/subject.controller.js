@@ -1,7 +1,6 @@
-const { cli } = require("winston/lib/winston/config");
 const Subject = require("../models/subject");
 
-const addSubject = async (req, res) => {
+const addSubject = async (req, res, next) => {
   try {
     const { name, description } = req.body;
 
@@ -15,12 +14,11 @@ const addSubject = async (req, res) => {
       data: newSubject,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding subject" });
+    next(error);
   }
 };
 
-const getAllSubjects = async (req, res) => {
+const getAllSubjects = async (req, res, next) => {
   try {
     const subjects = await Subject.findAll();
     res.status(201).send({
@@ -28,12 +26,11 @@ const getAllSubjects = async (req, res) => {
       data: subjects,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all subjects" });
+    next(error);
   }
 };
 
-const getSubjectById = async (req, res) => {
+const getSubjectById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const subject = await Subject.findByPk(id);
@@ -42,12 +39,11 @@ const getSubjectById = async (req, res) => {
       data: subject,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one subject" });
+    next(error);
   }
 };
 
-const updateSubjectById = async (req, res) => {
+const updateSubjectById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const subject = await Subject.update(req.body, {
@@ -60,12 +56,11 @@ const updateSubjectById = async (req, res) => {
       data: subject[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating subject" });
+    next(error);
   }
 };
 
-const deleteSubjectById = async (req, res) => {
+const deleteSubjectById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Subject.destroy({
@@ -76,8 +71,7 @@ const deleteSubjectById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting subject" });
+    next(error);
   }
 };
 

@@ -6,6 +6,7 @@ const {
   deleteAdmin,
 } = require("../controllers/admin.controller");
 const {
+  authenticateToken,
   creatorGuard,
   selfGuard,
   adminGuard,
@@ -17,16 +18,23 @@ const {
 } = require("../validations/admin.validation");
 const router = require("express").Router();
 
-router.post("/", creatorGuard, validate(adminRegisterSchema), createAdmin);
-router.get("/", adminGuard, getAllAdmin);
-router.get("/:id", adminGuard, getAdminById);
+router.post(
+  "/",
+  authenticateToken,
+  creatorGuard,
+  validate(adminRegisterSchema),
+  createAdmin
+);
+router.get("/", authenticateToken, adminGuard, getAllAdmin);
+router.get("/:id", authenticateToken, adminGuard, getAdminById);
 router.put(
   "/:id",
+  authenticateToken,
   creatorGuard,
   selfGuard,
   validate(adminUpdateSchema),
   updateAdmin
 );
-router.delete("/:id", creatorGuard, deleteAdmin);
+router.delete("/:id", authenticateToken, creatorGuard, deleteAdmin);
 
 module.exports = router;

@@ -2,7 +2,7 @@ const { sendErrorResponse } = require("../helpers/send.error.response");
 const Admin = require("../models/admin");
 const bcrypt = require("bcrypt");
 
-const createAdmin = async (req, res) => {
+const createAdmin = async (req, res, next) => {
   try {
     const { full_name, email, password, confirm_password, phone } = req.body;
     const candidate = await Admin.findOne({ where: { email } });
@@ -30,11 +30,11 @@ const createAdmin = async (req, res) => {
       data: newAdmin,
     });
   } catch (error) {
-    sendErrorResponse(error, res, 500);
+    next(error);
   }
 };
 
-const getAllAdmin = async (req, res) => {
+const getAllAdmin = async (req, res, next) => {
   try {
     const admins = await Admin.findAll();
     res.status(200).send({
@@ -42,11 +42,11 @@ const getAllAdmin = async (req, res) => {
       data: admins,
     });
   } catch (error) {
-    sendErrorResponse({ message: "Admins get error" }, res, 500);
+    next(error);
   }
 };
 
-const getAdminById = async (req, res) => {
+const getAdminById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const admin = await Admin.findByPk(id);
@@ -56,15 +56,15 @@ const getAdminById = async (req, res) => {
       return res.status(404).send({ message: "Admin not found" });
     }
     res.status(200).send({
-      message: `Admin number`,
+      message: `Admin number ${id}`,
       data: admin,
     });
   } catch (error) {
-    sendErrorResponse({ message: "Admin get error" }, res, 500);
+    next(error);
   }
 };
 
-const updateAdmin = async (req, res) => {
+const updateAdmin = async (req, res, next) => {
   try {
     const body = req.body;
     const { id } = req.params;
@@ -78,11 +78,11 @@ const updateAdmin = async (req, res) => {
       data: admin[1][0],
     });
   } catch (error) {
-    return sendErrorResponse({ message: "Error update admin" }, res, 500);
+    next(error);
   }
 };
 
-const deleteAdmin = async (req, res) => {
+const deleteAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
     const admin = await Admin.destroy({ where: { id } });
@@ -92,7 +92,7 @@ const deleteAdmin = async (req, res) => {
       data: admin,
     });
   } catch (error) {
-    sendErrorResponse({ message: "Error deleting admin" }, res, 500);
+    next(error);
   }
 };
 

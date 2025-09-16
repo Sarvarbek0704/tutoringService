@@ -1,7 +1,7 @@
-const { cli } = require("winston/lib/winston/config");
 const Client = require("../models/client");
+const bcrypt = require("bcrypt");
 
-const addClient = async (req, res) => {
+const addClient = async (req, res, next) => {
   try {
     const { full_name, email, phone, birth_date, password } = req.body;
     const candidate = await Client.findOne({ where: { email } });
@@ -11,12 +11,13 @@ const addClient = async (req, res) => {
         .send({ message: "This email has already been registered." });
     }
 
+    const hashed_password = await bcrypt.hash(password, 7);
     const newClient = await Client.create({
       full_name,
       email,
       phone,
       birth_date,
-      password,
+      password: hashed_password,
     });
     await newClient.save();
     res.status(201).send({
@@ -24,12 +25,11 @@ const addClient = async (req, res) => {
       data: newClient,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding client" });
+    next(error);
   }
 };
 
-const getAllClients = async (req, res) => {
+const getAllClients = async (req, res, next) => {
   try {
     const clients = await Client.findAll();
     res.status(201).send({
@@ -37,12 +37,11 @@ const getAllClients = async (req, res) => {
       data: clients,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all clients" });
+    next(error);
   }
 };
 
-const getClientById = async (req, res) => {
+const getClientById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const client = await Client.findByPk(id);
@@ -51,12 +50,11 @@ const getClientById = async (req, res) => {
       data: client,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one client" });
+    next(error);
   }
 };
 
-const updateClientById = async (req, res) => {
+const updateClientById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const client = await Client.update(req.body, {
@@ -69,12 +67,11 @@ const updateClientById = async (req, res) => {
       data: client[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating client" });
+    next(error);
   }
 };
 
-const deleteClientById = async (req, res) => {
+const deleteClientById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Client.destroy({
@@ -85,8 +82,7 @@ const deleteClientById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting client" });
+    next(error);
   }
 };
 

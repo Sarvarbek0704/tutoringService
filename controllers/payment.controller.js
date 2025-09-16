@@ -1,10 +1,8 @@
-const { cli } = require("winston/lib/winston/config");
 const Payment = require("../models/payment");
 
-const addPayment = async (req, res) => {
+const addPayment = async (req, res, next) => {
   try {
     const { student_id, course_id, contract_id, amount } = req.body;
-
     const newPayment = await Payment.create({
       student_id,
       course_id,
@@ -17,12 +15,11 @@ const addPayment = async (req, res) => {
       data: newPayment,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error adding payment" });
+    next(error);
   }
 };
 
-const getAllPayments = async (req, res) => {
+const getAllPayments = async (req, res, next) => {
   try {
     const payments = await Payment.findAll();
     res.status(201).send({
@@ -30,12 +27,11 @@ const getAllPayments = async (req, res) => {
       data: payments,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing all payments" });
+    next(error);
   }
 };
 
-const getPaymentById = async (req, res) => {
+const getPaymentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const payment = await Payment.findByPk(id);
@@ -44,12 +40,11 @@ const getPaymentById = async (req, res) => {
       data: payment,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error viewing one payment" });
+    next(error);
   }
 };
 
-const updatePaymentById = async (req, res) => {
+const updatePaymentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const payment = await Payment.update(req.body, {
@@ -62,12 +57,11 @@ const updatePaymentById = async (req, res) => {
       data: payment[1][0],
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while updating payment" });
+    next(error);
   }
 };
 
-const deletePaymentById = async (req, res) => {
+const deletePaymentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     await Payment.destroy({
@@ -78,8 +72,7 @@ const deletePaymentById = async (req, res) => {
       data: id,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error: "Error while deleting payment" });
+    next(error);
   }
 };
 

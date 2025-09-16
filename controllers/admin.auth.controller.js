@@ -4,32 +4,23 @@ const config = require("config");
 const jwtService = require("../services/jwt.service");
 const { adminRegisterSchema } = require("../validations/admin.validation");
 
-// Register (Ro'yxatdan o'tish)
 const register = async (req, res, next) => {
   try {
     const { error, value } = adminRegisterSchema.validate(req.body);
     if (error) {
       return res.status(400).json({
-        success: false,
         errors: error.details.map((err) => err.message),
       });
     }
-
     const { full_name, email, password, phone } = value;
-
-    // Email borligini tekshirish
     const existingAdmin = await Admin.findOne({ where: { email } });
     if (existingAdmin) {
       return res.status(400).json({
         success: false,
-        error: "Bu email allaqachon ro'yxatdan o'tgan",
+        error: "This email has been already exists",
       });
     }
-
-    // Password ni hash qilish
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Admin yaratish
+    const hashedPassword = await bcrypt.hash(password, 7);
     const admin = await Admin.create({
       full_name,
       email,
@@ -39,16 +30,15 @@ const register = async (req, res, next) => {
     });
     res.status(201).json({
       success: true,
-      message:
-        "Ro'yxatdan muvaffaqiyatli o'tdingiz.",
+      message: "Successfully registered",
       data: {
         id: admin.id,
         full_name: admin.full_name,
         email: admin.email,
+        phone: admin.phone,
       },
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -56,47 +46,42 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        error: "Email va parol kiritilishi shart",
+        error: "Email adn password is required",
       });
     }
-
-    // Admin ni topish
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) {
       return res.status(400).json({
         success: false,
-        error: "Email yoki parol noto'g'ri",
+        error: "Email or password incorrect",
       });
     }
-
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
-    if (!isPasswordValid) {
+    const password2 = await bcrypt.compare(password, admin.password);
+    if (!password2) {
       return res.status(400).json({
         success: false,
-        error: "Email yoki parol noto'g'ri",
+        error: "Email or password incorrect",
       });
     }
-
-    // Tokenlar yaratish
     const tokens = jwtService.generateTokens({
       id: admin.id,
       email: admin.email,
+      type: "admin",
       role: "admin",
     });
-
-    // Refresh tokenni saqlash
     await Admin.update(
-      { refreshToken: tokens.refreshToken },
+      { refreshToken: tokens.refreshToken, accessToken: tokens.accessToken },
       { where: { id: admin.id } }
     );
-
+    res.cookie("refreshToken", tokens.refreshToken, {
+      maxAge: config.get("cookie_refresh_token_time"),
+      httpOnly: true,
+    });
     res.json({
-      success: true,
-      message: "Muvaffaqiyatli kirdingiz",
+      message: "Successfully logged in",
       data: {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -113,118 +98,90 @@ const login = async (req, res, next) => {
   }
 };
 
-// Logout (Tizimdan chiqish)
 const logout = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: "RefreshToken not found in cookies",
+      });
+    }
+
+    const verifiedRefreshToken = await jwtService.verifyRefreshToken(
+      refreshToken
+    );
+    await Admin.update(
+      { refreshToken: null, accessToken: null },
+      { where: { id: verifiedRefreshToken.id } }
+    );
+    res.clearCookie("refreshToken");
+    res.json({
+      success: true,
+      message: "Successfully logged out",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.cookies;
 
     if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        error: "Refresh token kerak",
+        error: "RefreshToken not found in cookie",
       });
     }
+    const verifiedRefreshToken = await jwtService.verifyRefreshToken(
+      refreshToken
+    );
 
-    // Refresh tokenni o'chirish
-    await Admin.update({ refreshToken: null }, { where: { refreshToken } });
-
-    res.json({
-      success: true,
-      message: "Muvaffaqiyatli chiqdingiz",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Refresh Token (Token yangilash)
-const refreshToken = async (req, res, next) => {
-  try {
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-      return res.status(401).json({
-        success: false,
-        error: "Refresh token kerak",
-      });
-    }
-
-    // Refresh tokenni tekshirish
-    const decoded = await jwtService.verifyRefreshToken(refreshToken);
-
-    // Admin ni topish
-    const admin = await Admin.findOne({
-      where: { id: decoded.id, refreshToken },
-    });
-
+    const admin = await Admin.findByPk(verifiedRefreshToken.id);
     if (!admin) {
-      return res.status(403).json({
-        success: false,
-        error: "Yaroqsiz refresh token",
+      return res.status(404).json({
+        error: "User not found",
       });
     }
 
-    // Yangi tokenlar yaratish
+    if (admin.refreshToken !== refreshToken) {
+      return res.status(401).json({
+        error: "RefreshToken incorrect",
+      });
+    }
     const tokens = jwtService.generateTokens({
       id: admin.id,
       email: admin.email,
+      type: "admin",
       role: "admin",
     });
 
-    // Yangi refresh tokenni saqlash
     await Admin.update(
-      { refreshToken: tokens.refreshToken },
+      { refreshToken: tokens.refreshToken, accessToken: tokens.accessToken },
       { where: { id: admin.id } }
     );
 
-    res.json({
-      success: true,
-      data: {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-      },
+    res.cookie("refreshToken", tokens.refreshToken, {
+      maxAge: config.get("cookie_refresh_token_time"),
+      httpOnly: true,
+    });
+
+    res.status(200).json({
+      message: "Token updated",
+      accessToken: tokens.accessToken,
     });
   } catch (error) {
-    if (error.name === "JsonWebTokenError") {
-      return res.status(403).json({
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      return res.status(401).json({
         success: false,
-        error: "Yaroqsiz token",
+        error: "Old token, update token",
       });
     }
-
-    if (error.name === "TokenExpiredError") {
-      return res.status(403).json({
-        success: false,
-        error: "Token muddati o'tgan",
-      });
-    }
-
-    next(error);
-  }
-};
-
-// Profil ma'lumotlarini olish
-const getProfile = async (req, res, next) => {
-  try {
-    const adminId = req.admin.id;
-
-    const admin = await Admin.findByPk(adminId, {
-      attributes: { exclude: ["password", "refreshToken"] },
-    });
-
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        error: "Foydalanuvchi topilmadi",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: admin,
-    });
-  } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -234,5 +191,4 @@ module.exports = {
   login,
   logout,
   refreshToken,
-  getProfile,
 };
