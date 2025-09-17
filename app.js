@@ -2,6 +2,7 @@ const express = require("express");
 const config = require("config");
 const sequelize = require("./config/db");
 const cookieParser = require("cookie-parser");
+const applyAssociations = require("./associations");
 
 const mainRouter = require("./routes/index");
 const errorHandling = require("./middlewares/errorHandling");
@@ -12,7 +13,7 @@ const PORT = config.get("port") ?? 7777;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-
+applyAssociations();
 app.use("/api", mainRouter);
 app.use(errorHandling);
 const start = async () => {

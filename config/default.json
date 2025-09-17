@@ -4,7 +4,7 @@
   "db_username": "postgres",
   "db_password": "root",
   "db_port": 5432,
-  "db_name": "tutoringservicetest",
+  "db_name": "tutoringservicemain",
   "access_key": "SMD_access_key",
   "refresh_key": "SMD_refresh_key",
   "access_time": "5h",

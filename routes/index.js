@@ -11,6 +11,7 @@ const subjectRouter = require("./subject.routes");
 const clientAuthRouter = require("./client.auth.routes");
 const ownerAuthRouter = require("./owner.auth.routes");
 const adminAuthRouter = require("./admin.auth.routes");
+const reportRoutes = require("./report.routes");
 
 const router = require("express").Router();
 
@@ -27,5 +28,6 @@ router.use("/subject", subjectRouter);
 router.use("/client/auth", clientAuthRouter);
 router.use("/owner/auth", ownerAuthRouter);
 router.use("/admin/auth", adminAuthRouter);
+router.use("/reports", reportRoutes);
 
 module.exports = router;
